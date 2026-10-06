@@ -47,6 +47,11 @@ function FitRoute({ plan }: { plan: TripPlan | null }) {
   return null;
 }
 
+function formatActivityLabel(activity: string) {
+  const activityLabel = activity.replaceAll('_', ' ');
+  return activityLabel.charAt(0).toUpperCase() + activityLabel.slice(1);
+}
+
 function markerIcon(label: string, kind: string) {
   // Labels are fixed application symbols, never user-entered HTML.
   return divIcon({
@@ -103,7 +108,7 @@ export default function RouteMap({ plan }: { plan: TripPlan | null }) {
                   )}
                 >
                   <Popup>
-                    <strong>{event.activity.replaceAll('_', ' ')}</strong>
+                    <strong>{formatActivityLabel(event.activity)}</strong>
                     <p>{event.location.label}</p>
                     <p>
                       {formatDate(event.start_time, plan.terminal_timezone)} ·{' '}
