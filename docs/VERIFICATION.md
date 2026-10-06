@@ -1,6 +1,6 @@
 # Verification — 2026-10-06
 
-- Django: 14 tests passed, including driving/break/window/fuel/cycle constraints, rolling midnight, restart history, full-day sheet coverage, API errors, both provider adapters, and DST rejection.
+- Django: 17 tests passed (including three Photon geocoding regression tests), including driving/break/window/fuel/cycle constraints, rolling midnight, restart history, full-day sheet coverage, API errors, both provider adapters, and DST rejection.
 - React/TypeScript: `npm run build` passed. Prettier and Ruff checks passed.
 - npm installation audit: zero reported vulnerabilities at installation time.
 - Built application served with Waitress, WhiteNoise, and `DEBUG=false`; root page, health endpoint, and JavaScript asset returned HTTP 200.
@@ -41,3 +41,18 @@ An OSM 403 tile message exposed a configuration error: Django's `same-origin` re
 The rebuilt application was checked in the browser: map images rendered normally, their DOM referrer policy matched the intended setting, zoom buttons worked, and a wheel interaction increased the displayed tile zoom to level 7. The 14 backend tests, formatting checks, and production build passed again.
 
 ![Map and wheel zoom after correction](screenshots/map-zoom-fixed.jpg)
+
+
+## Public deployment verification
+
+- Repository: https://github.com/leonel-cc/Spotter-Trip-Planner (public, main branch).
+- Application: https://spotter-trip-planner-rosy.vercel.app (anonymous access verified).
+- GitHub Actions passed backend tests, Ruff checks, frontend formatting, and the production build.
+- Vercel uses Python 3.12, Django, Node.js 24, CDN static assets, and a 180-second function timeout.
+- WSGI initialization was verified from the repository root; the public health endpoint returns HTTP 200.
+- The sample Chicago → Indianapolis → Dallas trip generated the route, one overnight rest, one fuel stop, and two daily logs.
+- Map tiles rendered normally, without access-blocked tiles. Both log days displayed their remarks and recaps.
+- Public Photon search returned a Boston, Massachusetts result; stop descriptions retain the road-route coordinates.
+- Download PDF produced a real 368,224-byte file with two Letter pages in the browser's Downloads folder.
+- Git integration generated a production deployment automatically after pushing the WSGI fix.
+- Production and Preview secrets are stored in Vercel; local `.env*` files and `.vercel` metadata are ignored by Git.
