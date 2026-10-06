@@ -1,0 +1,11 @@
+.git
+.venv
+**/__pycache__
+**/*.pyc
+**/.env
+**/node_modules
+frontend/dist
+backend/staticfiles
+tmp
+docs/screenshots
+.ruff_cache

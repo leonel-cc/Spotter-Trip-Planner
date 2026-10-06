@@ -1,0 +1,7 @@
+Django==5.2.18
+djangorestframework==3.16.1
+requests==2.34.2
+whitenoise==6.12.0
+python-dotenv==1.2.4
+waitress==3.0.2
+tzdata==2026.5

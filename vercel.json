@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "django",
+  "buildCommand": "npm ci --prefix frontend && npm run build --prefix frontend",
+  "functions": {
+    "backend/config/wsgi.py": {
+      "maxDuration": 180
+    }
+  }
+}
