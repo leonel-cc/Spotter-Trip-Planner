@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { divIcon } from 'leaflet';
+import { divIcon, latLngBounds } from 'leaflet';
 import {
   MapContainer,
   TileLayer,
@@ -12,6 +12,29 @@ import {
 import type { TripPlan } from '../types';
 import { formatDate, formatTime, formatDuration } from '../format';
 
+const worldMapBounds = latLngBounds([-85.05112878, -180], [85.05112878, 180]);
+
+function MapViewportLimits() {
+  const map = useMap();
+
+  useEffect(() => {
+    const updateViewportLimits = () => {
+      map.invalidateSize({ animate: false });
+      // Keep the viewport inside one world, including on wide screens.
+      const minimumZoom = Math.max(3, map.getBoundsZoom(worldMapBounds, true));
+      map.setMinZoom(minimumZoom);
+      map.panInsideBounds(worldMapBounds, { animate: false });
+    };
+
+    updateViewportLimits();
+    const observer = new ResizeObserver(updateViewportLimits);
+    observer.observe(map.getContainer());
+    return () => observer.disconnect();
+  }, [map]);
+
+  return null;
+}
+
 function FitRoute({ plan }: { plan: TripPlan | null }) {
   const map = useMap();
   useEffect(() => {
@@ -20,9 +43,6 @@ function FitRoute({ plan }: { plan: TripPlan | null }) {
         plan.route.geometry.map(([longitude, latitude]) => [latitude, longitude]),
         { padding: [50, 50], maxZoom: 12 },
       );
-    const observer = new ResizeObserver(() => map.invalidateSize());
-    observer.observe(map.getContainer());
-    return () => observer.disconnect();
   }, [map, plan]);
   return null;
 }
@@ -40,13 +60,24 @@ function markerIcon(label: string, kind: string) {
 export default function RouteMap({ plan }: { plan: TripPlan | null }) {
   return (
     <div className="route-map">
-      <MapContainer center={[38.5, -95]} zoom={4} scrollWheelZoom zoomControl={false}>
+      <MapContainer
+        center={[38.5, -95]}
+        zoom={4}
+        minZoom={3}
+        maxBounds={worldMapBounds}
+        maxBoundsViscosity={1}
+        bounceAtZoomLimits={false}
+        scrollWheelZoom
+        zoomControl={false}
+      >
         <ZoomControl position="topright" />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+          noWrap
           referrerPolicy="strict-origin-when-cross-origin"
         />
+        <MapViewportLimits />
         <FitRoute plan={plan} />
         {plan && (
           <>
